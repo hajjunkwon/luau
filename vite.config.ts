@@ -14,7 +14,7 @@ export default defineConfig({
     strictPort: true,
   },
   optimizeDeps: {
-    exclude: ["wasmoon"],
+    include: ["wasmoon"],
   },
   assetsInclude: ["**/*.wasm"],
   build: {

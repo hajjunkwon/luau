@@ -1,4 +1,4 @@
-import { LuaFactory } from "wasmoon";
+import type { LuaFactory } from "wasmoon";
 import type { RunResult } from "../types";
 import { detectUnsupported, transpileLuau } from "./transpile";
 
@@ -238,16 +238,35 @@ loadfile = nil
 require = nil
 `;
 
+type LuaFactoryClass = new (customWasmUri?: string) => LuaFactory;
+
 let factoryPromise: Promise<LuaFactory> | null = null;
 
 function wasmUrl(): string | undefined {
   if (typeof window === "undefined") return undefined;
-  return "/glue.wasm";
+  return `${window.location.origin}/glue.wasm`;
+}
+
+async function loadLuaFactoryClass(): Promise<LuaFactoryClass> {
+  const mod = await import("wasmoon");
+  const record = mod as {
+    LuaFactory?: LuaFactoryClass;
+    default?: { LuaFactory?: LuaFactoryClass } | LuaFactoryClass;
+  };
+  const Ctor =
+    record.LuaFactory ??
+    (typeof record.default === "function"
+      ? record.default
+      : record.default?.LuaFactory);
+  if (!Ctor) {
+    throw new Error("Lua 엔진을 불러오지 못했습니다.");
+  }
+  return Ctor;
 }
 
 async function getFactory(): Promise<LuaFactory> {
   if (!factoryPromise) {
-    factoryPromise = Promise.resolve(new LuaFactory(wasmUrl()));
+    factoryPromise = loadLuaFactoryClass().then((Ctor) => new Ctor(wasmUrl()));
   }
   return factoryPromise;
 }
