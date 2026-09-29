@@ -15,6 +15,16 @@ export type ChoiceTask = {
   explain: string;
 };
 
+export type ShortTask = {
+  kind: "short";
+  id: string;
+  prompt: string;
+  answers: string[];
+  explain: string;
+  placeholder?: string;
+  topic?: string;
+};
+
 export type CodeTest =
   | { kind: "output-equals"; value: string }
   | { kind: "output-includes"; value: string }
@@ -35,7 +45,7 @@ export type CodeTask = {
   solution: string;
 };
 
-export type Task = ChoiceTask | CodeTask;
+export type Task = ChoiceTask | ShortTask | CodeTask;
 
 export type Lesson = {
   id: string;

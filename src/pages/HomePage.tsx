@@ -64,10 +64,10 @@ export function HomePage() {
           </p>
         </article>
         <article>
-          <h2>레슨 퀴즈</h2>
+          <h2>주관식 퀴즈</h2>
           <p>
-            객관식과 코드 제출이 섞여 있습니다. 출력이 맞는지, 필수 문법을 썼는지
-            같이 채점합니다.
+            print, ~=, Instance.new 같은 짧은 답을 직접 씁니다. 레슨 안에도 주관식이
+            있고, 퀴즈 탭에서 20문제를 무작위로 풉니다.
           </p>
         </article>
       </section>

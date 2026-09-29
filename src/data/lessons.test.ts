@@ -15,6 +15,8 @@ describe("lessons", () => {
           expect(task.choices.length).toBeGreaterThan(1);
           expect(task.answer).toBeGreaterThanOrEqual(0);
           expect(task.answer).toBeLessThan(task.choices.length);
+        } else if (task.kind === "short") {
+          expect(task.answers.length).toBeGreaterThan(0);
         } else {
           expect(task.tests.length).toBeGreaterThan(0);
           expect(task.solution.length).toBeGreaterThan(0);

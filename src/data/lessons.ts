@@ -1,4 +1,11 @@
-import type { Lesson } from "../types";
+import type { Lesson, ShortTask } from "../types";
+import { shortBank } from "./shorts";
+
+function takeShort(id: string): ShortTask {
+  const found = shortBank.find((item) => item.id === id);
+  if (!found) throw new Error(`missing short ${id}`);
+  return found;
+}
 
 export const lessons: Lesson[] = [
   {
@@ -23,14 +30,8 @@ print("이건 실행됨")`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "print-q1",
-        prompt: "Luau에서 화면에 글을 출력하는 함수는 무엇인가요?",
-        choices: ["echo", "print", "console.log", "say"],
-        answer: 1,
-        explain: "Luau와 Lua는 print를 씁니다. JavaScript의 console.log와 역할이 비슷합니다.",
-      },
+      takeShort("s-print"),
+      takeShort("s-comment"),
       {
         kind: "code",
         id: "print-q2",
@@ -80,14 +81,8 @@ print(coins)`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "var-q1",
-        prompt: "로블록스 스크립트에서 변수에 권장되는 선언은 무엇인가요?",
-        choices: ["var coins = 1", "let coins = 1", "local coins = 1", "const coins = 1"],
-        answer: 2,
-        explain: "Luau는 local을 씁니다. JavaScript의 let/const와 비슷한 역할입니다.",
-      },
+      takeShort("s-local"),
+      takeShort("s-nil"),
       {
         kind: "code",
         id: "var-q2",
@@ -138,14 +133,8 @@ print(coins)`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "num-q1",
-        prompt: "Luau에서 나머지(modulo) 연산자는 무엇인가요?",
-        choices: ["mod", "%", "//", "rem"],
-        answer: 1,
-        explain: "10 % 3 은 1입니다. // 는 나눗셈의 정수 몫입니다.",
-      },
+      takeShort("s-mod"),
+      takeShort("s-add-eq"),
       {
         kind: "code",
         id: "num-q2",
@@ -204,14 +193,7 @@ print("Coins: " .. coins)`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "str-q1",
-        prompt: "두 문자열을 이어 붙이는 연산자는?",
-        choices: ["+", "&", "..", "++"],
-        answer: 2,
-        explain: 'JavaScript의 +와 달리 Luau 문자열 연결은 .. 입니다.',
-      },
+      takeShort("s-concat"),
       {
         kind: "code",
         id: "str-q2",
@@ -262,14 +244,8 @@ end`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "if-q1",
-        prompt: "Luau에서 '같지 않다'는 연산자는?",
-        choices: ["!=", "<>", "~=", "!=="],
-        answer: 2,
-        explain: "물결표와 같습니다. if a ~= b then",
-      },
+      takeShort("s-neq"),
+      takeShort("s-then"),
       {
         kind: "code",
         id: "if-q2",
@@ -331,6 +307,8 @@ end`,
       },
     ],
     tasks: [
+      takeShort("s-for"),
+      takeShort("s-while"),
       {
         kind: "choice",
         id: "loop-q1",
@@ -385,14 +363,8 @@ greet("Nova")`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "fn-q1",
-        prompt: "함수에서 결과를 돌려주는 키워드는?",
-        choices: ["yield", "give", "return", "send"],
-        answer: 2,
-        explain: "return 값. return만 쓰면 nil을 돌려주는 것과 비슷하게 함수가 끝납니다.",
-      },
+      takeShort("s-function"),
+      takeShort("s-return"),
       {
         kind: "code",
         id: "fn-q2",
@@ -440,14 +412,8 @@ print(part["Anchored"])`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "tbl-q1",
-        prompt: "Luau 배열에서 첫 번째 원소의 인덱스는?",
-        choices: ["0", "1", "-1", "first"],
-        answer: 1,
-        explain: "Lua 계열은 1부터 셉니다. pets[1]이 첫 값입니다.",
-      },
+      takeShort("s-index1"),
+      takeShort("s-len"),
       {
         kind: "code",
         id: "tbl-q2",
@@ -491,6 +457,8 @@ print(Players.LocalPlayer.Name)`,
       },
     ],
     tasks: [
+      takeShort("s-instance-new"),
+      takeShort("s-parent"),
       {
         kind: "choice",
         id: "inst-q1",
@@ -566,14 +534,8 @@ end)`,
       },
     ],
     tasks: [
-      {
-        kind: "choice",
-        id: "ev-q1",
-        prompt: "이벤트가 발생했을 때 실행할 함수를 연결하는 메서드는?",
-        choices: [":Bind()", ":On()", ":Connect()", ":Listen()"],
-        answer: 2,
-        explain: "Roblox 이벤트는 항상 :Connect(function() ... end) 패턴입니다.",
-      },
+      takeShort("s-connect"),
+      takeShort("s-touched"),
       {
         kind: "code",
         id: "ev-q2",

@@ -490,6 +490,38 @@ small {
   background: #301616;
 }
 
+.short-form {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 8px;
+  max-width: 640px;
+}
+
+.short-input {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  padding: 14px 16px;
+}
+
+.short-input:focus {
+  outline: none;
+  border-color: var(--lime);
+}
+
+.short-input.right {
+  border-color: #3d7a45;
+  background: #16301c;
+}
+
+.short-input.wrong {
+  border-color: #7a3d3d;
+  background: #301616;
+}
+
 .editor-frame {
   border: 1px solid #243041;
   overflow: hidden;

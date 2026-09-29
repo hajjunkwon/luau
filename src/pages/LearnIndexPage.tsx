@@ -11,7 +11,7 @@ export function LearnIndexPage() {
         <p className="eyebrow">학습</p>
         <h1>레슨 10개로 print부터 이벤트까지</h1>
         <p className="lede">
-          각 레슨은 짧은 설명 뒤에 객관식과 코드 과제가 이어집니다. 코드 과제는
+          각 레슨은 짧은 설명 뒤에 주관식·코드 과제가 이어집니다. 코드 과제는
           이 브라우저에서 실제로 실행해 채점합니다.
         </p>
       </header>

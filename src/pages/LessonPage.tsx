@@ -6,8 +6,9 @@ import { OutputConsole } from "../components/OutputConsole";
 import { gradeCode } from "../lib/checkQuiz";
 import { markLesson, markTask, visitLesson } from "../lib/progress";
 import { useProgress } from "../lib/useProgress";
-import type { ChoiceTask, CodeTask, GradeResult, RunResult } from "../types";
+import type { ChoiceTask, CodeTask, GradeResult, RunResult, ShortTask } from "../types";
 import { runLuau } from "../lib/runtime";
+import { gradeShort, primaryAnswer } from "../lib/gradeShort";
 
 export function LessonPage() {
   const { id = "" } = useParams();
@@ -86,6 +87,16 @@ export function LessonPage() {
                 }
               }}
             />
+          ) : task.kind === "short" ? (
+            <ShortTaskView
+              task={task}
+              onSolved={() => {
+                const next = markTask(task.id);
+                if (lesson.tasks.every((t) => next.completedTasks.includes(t.id))) {
+                  markLesson(lesson.id);
+                }
+              }}
+            />
           ) : (
             <CodeTaskView
               task={task}
@@ -134,6 +145,66 @@ export function LessonPage() {
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+function ShortTaskView({
+  task,
+  onSolved,
+}: {
+  task: ShortTask;
+  onSolved: () => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    setDraft("");
+    setChecked(false);
+  }, [task.id]);
+
+  const correct = gradeShort(draft, task.answers);
+
+  return (
+    <div className="task-card">
+      <p className="task-kind">주관식</p>
+      <h2>{task.prompt}</h2>
+      <form
+        className="short-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!draft.trim()) return;
+          setChecked(true);
+          if (gradeShort(draft, task.answers)) onSolved();
+        }}
+      >
+        <input
+          className={`short-input ${checked ? (correct ? "right" : "wrong") : ""}`}
+          value={draft}
+          onChange={(event) => {
+            setChecked(false);
+            setDraft(event.target.value);
+          }}
+          placeholder={task.placeholder ?? "답을 입력하세요"}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+        <div className="task-actions">
+          <button type="submit" className="btn primary" disabled={!draft.trim()}>
+            정답 확인
+          </button>
+        </div>
+      </form>
+      {checked ? (
+        <p className={`feedback ${correct ? "ok" : "bad"}`}>
+          {correct ? "맞았습니다. " : `정답은 ${primaryAnswer(task.answers)} . `}
+          {task.explain}
+        </p>
+      ) : (
+        <p className="hint">키워드나 기호를 그대로 쓰면 됩니다. print() 처럼 괄호를 붙여도 됩니다.</p>
+      )}
     </div>
   );
 }
