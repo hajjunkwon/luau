@@ -17,8 +17,13 @@ describe("transpileLuau", () => {
     expect(out).not.toContain(": number");
   });
 
-  it("does not rewrite += inside strings", () => {
-    expect(transpileLuau('print("score += 1")')).toBe('print("score += 1")');
+  it("does not treat method calls as type annotations", () => {
+    expect(transpileLuau('print(workspace:WaitForChild("Door").Name)')).toBe(
+      'print(workspace:WaitForChild("Door").Name)',
+    );
+    expect(transpileLuau('print(workspace:FindFirstChild("Flag").Name)')).toBe(
+      'print(workspace:FindFirstChild("Flag").Name)',
+    );
   });
 
   it("flags continue and interpolation", () => {

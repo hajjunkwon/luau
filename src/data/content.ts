@@ -84,6 +84,64 @@ foot.Name = "LeftFoot"
 lava.Touched:Fire(foot)
 `,
   },
+  {
+    id: "click",
+    title: "클릭하면 열기",
+    blurb: "ClickDetector.MouseClick",
+    code: `local door = Instance.new("Part")
+door.Name = "Door"
+door.Parent = workspace
+
+local detector = Instance.new("ClickDetector")
+detector.Parent = door
+
+detector.MouseClick:Connect(function()
+  print("opened " .. door.Name)
+end)
+
+detector.MouseClick:Fire()
+`,
+  },
+  {
+    id: "hp",
+    title: "데미지",
+    blurb: "Humanoid:TakeDamage",
+    code: `local humanoid = Instance.new("Humanoid")
+print("start " .. humanoid.Health)
+
+humanoid:TakeDamage(35)
+print("now " .. humanoid.Health)
+`,
+  },
+  {
+    id: "inventory",
+    title: "인벤토리",
+    blurb: "insert, ipairs, #",
+    code: `local bag = {"coin", "key"}
+table.insert(bag, "gem")
+
+print("count " .. #bag)
+for i, item in ipairs(bag) do
+  print(i .. ": " .. item)
+end
+`,
+  },
+  {
+    id: "find",
+    title: "자식 찾기",
+    blurb: "FindFirstChild / WaitForChild",
+    code: `local flag = Instance.new("Part")
+flag.Name = "Flag"
+flag.Parent = workspace
+
+local found = workspace:FindFirstChild("Flag")
+print(found.Name)
+
+local same = workspace:WaitForChild("Flag")
+print(same.Name)
+print("kids " .. #workspace:GetChildren())
+`,
+  },
 ];
 
 export type CheatSection = {
@@ -106,6 +164,19 @@ export const cheatSections: CheatSection[] = [
     ],
   },
   {
+    title: "라이브러리",
+    rows: [
+      { token: "math.floor(n)", meaning: "소수점 아래 버림" },
+      { token: "math.max(a, b)", meaning: "더 큰 값" },
+      { token: "string.upper(s)", meaning: "대문자" },
+      { token: "string.sub(s, 1, 3)", meaning: "잘라 내기. 1부터" },
+      { token: "table.insert(t, v)", meaning: "배열 끝에 넣기" },
+      { token: "ipairs(list)", meaning: "배열 순회" },
+      { token: "#list / #s", meaning: "길이와 글자 수" },
+      { token: "task.spawn(fn)", meaning: "함수를 바로(연습장) 실행" },
+    ],
+  },
+  {
     title: "Roblox 객체",
     rows: [
       { token: 'Instance.new("Part")', meaning: "새 인스턴스 생성" },
@@ -116,6 +187,18 @@ export const cheatSections: CheatSection[] = [
       { token: "event:Connect(fn)", meaning: "이벤트 구독" },
       { token: "part.Touched", meaning: "무언가 닿았을 때" },
       { token: "Players.PlayerAdded", meaning: "플레이어 입장" },
+    ],
+  },
+  {
+    title: "실전 조각",
+    rows: [
+      { token: "ClickDetector.MouseClick", meaning: "클릭했을 때" },
+      { token: "humanoid:TakeDamage(n)", meaning: "체력 깎기. 기본 100" },
+      { token: ':FindFirstChild("Name")', meaning: "자식 찾기. 없으면 nil" },
+      { token: ':WaitForChild("Name")', meaning: "연습장에서는 바로 찾기" },
+      { token: "GetChildren()", meaning: "자식 배열" },
+      { token: "BrickColor.new(name)", meaning: "이름 붙은 색" },
+      { token: "Enum.Material.Neon", meaning: "재질 상수" },
     ],
   },
 ];

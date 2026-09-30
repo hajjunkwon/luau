@@ -23,7 +23,7 @@ export async function gradeCode(task: CodeTask, source: string): Promise<GradeRe
   );
 
   if (needsRun) {
-    run = await runLuau(source, task.after);
+    run = await runLuau(source, task.after ?? "", task.before ?? "");
     if (!run.ok) {
       messages.push({ ok: false, text: run.error ?? "실행 중 오류가 났습니다." });
       return { passed: false, messages, run };

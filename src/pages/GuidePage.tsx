@@ -12,8 +12,9 @@ export function GuidePage() {
         <h1>자주 쓰는 Luau / Roblox 조각</h1>
         <p className="lede">
           이 연습장의 실행기는 Lua 5.4 기반입니다. 타입 표기와 += 는 실행 전에
-          변환하고, continue나 문자열 보간은 아직 돌리지 않습니다. 실제 Studio의
-          물리·네트워크·보안 문맥과는 다릅니다.
+          변환하고, continue나 문자열 보간은 아직 돌리지 않습니다. 퀴즈는 조건을
+          보고 코드를 짜면 실행 결과로 채점합니다. 실제 Studio의 물리·네트워크·보안
+          문맥과는 다릅니다.
         </p>
       </header>
       <div className="cheat-grid">

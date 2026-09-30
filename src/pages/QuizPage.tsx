@@ -1,52 +1,44 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { pickShortQuiz, QUIZ_LENGTH, shortBank } from "../data/shorts";
-import { gradeShort, primaryAnswer } from "../lib/gradeShort";
+import { CodeMission } from "../components/CodeMission";
+import { challengeBank, pickChallenges, QUIZ_LENGTH } from "../data/challenges";
 import { setExamBest } from "../lib/progress";
 import { useProgress } from "../lib/useProgress";
-import type { ShortTask } from "../types";
+import type { CodeMission as Mission } from "../data/challenges";
 
 export function QuizPage() {
   const progress = useProgress();
-  const [items, setItems] = useState<ShortTask[] | null>(null);
+  const [items, setItems] = useState<Mission[] | null>(null);
   const [index, setIndex] = useState(0);
-  const [draft, setDraft] = useState("");
-  const [checked, setChecked] = useState(false);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [passed, setPassed] = useState<boolean[]>([]);
   const [done, setDone] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [solvedHere, setSolvedHere] = useState(false);
 
   const start = () => {
-    setItems(pickShortQuiz());
+    setItems(pickChallenges());
     setIndex(0);
-    setDraft("");
-    setChecked(false);
-    setAnswers([]);
+    setPassed([]);
     setDone(false);
+    setSolvedHere(false);
   };
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, [index, items, done]);
-
-  const score = useMemo(() => {
-    if (!items) return 0;
-    return items.reduce(
-      (sum, item, i) => sum + (gradeShort(answers[i] ?? "", item.answers) ? 1 : 0),
-      0,
-    );
-  }, [items, answers]);
+  const finish = (results: boolean[]) => {
+    const score = results.filter(Boolean).length;
+    setExamBest(score);
+    setPassed(results);
+    setDone(true);
+  };
 
   if (!items) {
     return (
       <div className="page">
         <header className="page-head">
           <p className="eyebrow">퀴즈</p>
-          <h1>키워드를 직접 쓰는 주관식</h1>
+          <h1>조건을 보고 코드를 짜는 미션</h1>
           <p className="lede">
-            문제 은행 {shortBank.length}개 중에서 {QUIZ_LENGTH}문제를 무작위로
-            냅니다. print, ~=, Instance.new 같은 짧은 답을 직접 입력하세요.
-            대소문자와 괄호는 조금 느슨하게 봅니다.
+            플레이그라운드와 같은 편집기입니다. {challengeBank.length}개 미션 중
+            {QUIZ_LENGTH}개를 무작위로 뽑습니다. 조건을 만족하도록 코드를 쓰고
+            실행·채점하세요. 틀려도 고쳐서 다시 내면 됩니다.
           </p>
         </header>
         <div className="exam-intro">
@@ -54,10 +46,10 @@ export function QuizPage() {
             최고점 <strong>{progress.examBest}</strong> / {QUIZ_LENGTH}
           </p>
           <button type="button" className="btn primary" onClick={start}>
-            퀴즈 시작
+            미션 시작
           </button>
-          <Link className="btn ghost" to="/learn">
-            레슨으로
+          <Link className="btn ghost" to="/playground">
+            플레이그라운드
           </Link>
         </div>
       </div>
@@ -65,6 +57,7 @@ export function QuizPage() {
   }
 
   if (done) {
+    const score = passed.filter(Boolean).length;
     return (
       <div className="page">
         <header className="page-head">
@@ -74,26 +67,19 @@ export function QuizPage() {
           </h1>
           <p className="lede">
             {score === items.length
-              ? "전부 맞았습니다. 플레이그라운드에서 파트를 하나 만들어 보세요."
-              : "틀린 칸만 다시 보면 바로 붙습니다. 짧은 기호일수록 손보다 눈이 먼저입니다."}
+              ? "전부 통과했습니다. 플레이그라운드에서 더 큰 스크립트를 짜 보세요."
+              : "건너뛴 미션은 다시 풀기에서 다른 조합으로 나올 수 있습니다."}
           </p>
         </header>
         <ol className="review-list">
-          {items.map((item, i) => {
-            const ok = gradeShort(answers[i] ?? "", item.answers);
-            return (
-              <li key={item.id} className={ok ? "ok" : "bad"}>
-                <p>
-                  <span>{ok ? "정답" : "오답"}</span> {item.prompt}
-                </p>
-                <small>
-                  {item.topic} · 내 답: {answers[i] || "(빈칸)"} · 정답:{" "}
-                  {primaryAnswer(item.answers)}
-                </small>
-                <em>{item.explain}</em>
-              </li>
-            );
-          })}
+          {items.map((item, i) => (
+            <li key={item.id} className={passed[i] ? "ok" : "bad"}>
+              <p>
+                <span>{passed[i] ? "통과" : "건너뜀"}</span> {item.prompt}
+              </p>
+              <small>{item.topic}</small>
+            </li>
+          ))}
         </ol>
         <div className="hero-actions">
           <button type="button" className="btn primary" onClick={start}>
@@ -108,84 +94,46 @@ export function QuizPage() {
   }
 
   const current = items[index];
-  const correct = gradeShort(draft, current.answers);
 
-  const submit = () => {
-    if (checked) {
-      goNext(answers);
-      return;
-    }
-    if (!draft.trim()) return;
-    const nextAnswers = [...answers, draft];
-    setAnswers(nextAnswers);
-    setChecked(true);
-  };
-
-  const goNext = (recorded: string[]) => {
-    setDraft("");
-    setChecked(false);
-    if (index + 1 >= items.length) {
-      const nextScore = items.reduce(
-        (sum, item, i) => sum + (gradeShort(recorded[i] ?? "", item.answers) ? 1 : 0),
-        0,
-      );
-      setExamBest(nextScore);
-      setDone(true);
-    } else {
+  const goNext = (didPass: boolean) => {
+    const nextPassed = [...passed, didPass];
+    setSolvedHere(false);
+    if (index + 1 >= items.length) finish(nextPassed);
+    else {
+      setPassed(nextPassed);
       setIndex((value) => value + 1);
     }
   };
 
   return (
-    <div className="page">
+    <div className="page quiz-mission">
       <header className="page-head split">
         <div>
           <p className="eyebrow">
-            주관식 {index + 1} / {items.length}
-            {current.topic ? ` · ${current.topic}` : ""}
+            미션 {index + 1} / {items.length} · {current.topic}
           </p>
           <h1>{current.prompt}</h1>
         </div>
       </header>
-      <form
-        className="short-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          submit();
-        }}
-      >
-        <input
-          ref={inputRef}
-          className={`short-input ${checked ? (correct ? "right" : "wrong") : ""}`}
-          value={draft}
-          onChange={(event) => {
-            if (checked) return;
-            setDraft(event.target.value);
-          }}
-          placeholder={current.placeholder ?? "답을 입력하세요"}
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          readOnly={checked}
-        />
-        <div className="task-actions">
-          <button type="submit" className="btn primary" disabled={!checked && !draft.trim()}>
-            {checked
-              ? index + 1 === items.length
-                ? "결과 보기"
-                : "다음"
-              : "확인"}
-          </button>
-        </div>
-      </form>
-      {checked ? (
-        <p className={`feedback ${correct ? "ok" : "bad"}`}>
-          {correct ? "맞았습니다. " : `정답은 ${primaryAnswer(current.answers)} . `}
-          {current.explain}
-        </p>
-      ) : (
-        <p className="hint">Enter로 확인합니다. print(), Connect 처럼 괄호를 붙여도 됩니다.</p>
-      )}
+      <CodeMission
+        key={current.id}
+        task={current}
+        editorHeight="320px"
+        onSolved={() => setSolvedHere(true)}
+      />
+      <div className="task-nav">
+        <button type="button" className="btn ghost" onClick={() => goNext(false)}>
+          건너뛰기
+        </button>
+        <button
+          type="button"
+          className="btn primary"
+          disabled={!solvedHere}
+          onClick={() => goNext(true)}
+        >
+          {index + 1 === items.length ? "결과 보기" : "다음 미션"}
+        </button>
+      </div>
     </div>
   );
 }

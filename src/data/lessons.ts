@@ -1,11 +1,5 @@
-import type { Lesson, ShortTask } from "../types";
-import { shortBank } from "./shorts";
-
-function takeShort(id: string): ShortTask {
-  const found = shortBank.find((item) => item.id === id);
-  if (!found) throw new Error(`missing short ${id}`);
-  return found;
-}
+import type { Lesson } from "../types";
+import { extraLessons } from "./extraLessons";
 
 export const lessons: Lesson[] = [
   {
@@ -30,12 +24,11 @@ print("이건 실행됨")`,
       },
     ],
     tasks: [
-      takeShort("s-print"),
-      takeShort("s-comment"),
       {
         kind: "code",
         id: "print-q2",
         prompt: 'print를 써서 Hello Roblox 를 출력하세요. 대소문자와 띄어쓰기를 그대로 맞추면 됩니다.',
+        goals: ['print로 Hello Roblox 한 줄을 출력한다'],
         starter: `-- 한 줄로 출력해 보세요
 
 `,
@@ -81,12 +74,11 @@ print(coins)`,
       },
     ],
     tasks: [
-      takeShort("s-local"),
-      takeShort("s-nil"),
       {
         kind: "code",
         id: "var-q2",
         prompt: 'local 변수 name에 "Nova"를 넣고, print(name)으로 출력하세요.',
+        goals: ['local name 을 만든다', '출력은 Nova'],
         starter: `-- local 변수를 만들고 출력하세요
 
 `,
@@ -133,12 +125,11 @@ print(coins)`,
       },
     ],
     tasks: [
-      takeShort("s-mod"),
-      takeShort("s-add-eq"),
       {
         kind: "code",
         id: "num-q2",
         prompt: "7과 6을 곱한 결과를 print로 출력하세요. 계산은 코드가 하게 하세요.",
+        goals: ["7 * 6 을 코드에서 계산한다", "출력은 42", "42를 직접 적지 않는다"],
         starter: `-- 7 * 6 의 결과를 출력
 
 `,
@@ -153,6 +144,7 @@ print(coins)`,
         kind: "code",
         id: "num-q3",
         prompt: "local score = 10 에서 시작해 += 로 5를 더한 뒤 score를 출력하세요.",
+        goals: ["+= 를 쓴다", "출력은 15"],
         starter: `local score = 10
 -- 여기에 += 를 쓰세요
 
@@ -193,11 +185,11 @@ print("Coins: " .. coins)`,
       },
     ],
     tasks: [
-      takeShort("s-concat"),
       {
         kind: "code",
         id: "str-q2",
         prompt: 'local map = "Lobby" 와 local id = 3 을 이어 "Lobby-3" 을 출력하세요.',
+        goals: [".. 으로 이어 붙인다", "출력은 Lobby-3"],
         starter: `local map = "Lobby"
 local id = 3
 -- map과 id를 이어 출력하세요
@@ -211,6 +203,22 @@ local id = 3
         solution: `local map = "Lobby"
 local id = 3
 print(map .. "-" .. id)`,
+      },
+      {
+        kind: "code",
+        id: "str-q3",
+        prompt: "word의 글자 수를 #로 세어 출력하세요.",
+        goals: ["# 연산자를 쓴다", "출력은 5"],
+        starter: `local word = "Luau!"
+
+`,
+        tests: [
+          { kind: "source-includes", values: ["#"] },
+          { kind: "output-equals", value: "5" },
+        ],
+        hint: "print(#word)",
+        solution: `local word = "Luau!"
+print(#word)`,
       },
     ],
   },
@@ -244,12 +252,11 @@ end`,
       },
     ],
     tasks: [
-      takeShort("s-neq"),
-      takeShort("s-then"),
       {
         kind: "code",
         id: "if-q2",
         prompt: "score가 10 이상이면 pass, 아니면 fail 을 출력하세요. if문을 사용하세요.",
+        goals: ["if / then / end 를 쓴다", "지금 score는 12라서 pass"],
         starter: `local score = 12
 -- if score >= 10 then ...
 
@@ -307,8 +314,6 @@ end`,
       },
     ],
     tasks: [
-      takeShort("s-for"),
-      takeShort("s-while"),
       {
         kind: "choice",
         id: "loop-q1",
@@ -321,6 +326,7 @@ end`,
         kind: "code",
         id: "loop-q2",
         prompt: "for문으로 1부터 5까지 한 줄에 하나씩 숫자를 출력하세요.",
+        goals: ["for / do / end 를 쓴다", "출력 1 / 2 / 3 / 4 / 5"],
         starter: `-- for i = 1, 5 do
 
 `,
@@ -331,6 +337,25 @@ end`,
         hint: "for i = 1, 5 do print(i) end",
         solution: `for i = 1, 5 do
   print(i)
+end`,
+      },
+      {
+        kind: "code",
+        id: "loop-q3",
+        prompt: "while로 2, 1 을 한 줄씩 출력하세요.",
+        goals: ["while 사용", "출력 2 / 1"],
+        starter: `local n = 2
+
+`,
+        tests: [
+          { kind: "source-includes", values: ["while"] },
+          { kind: "output-lines", values: ["2", "1"] },
+        ],
+        hint: "while n > 0 do print(n) n -= 1 end",
+        solution: `local n = 2
+while n > 0 do
+  print(n)
+  n -= 1
 end`,
       },
     ],
@@ -363,12 +388,11 @@ greet("Nova")`,
       },
     ],
     tasks: [
-      takeShort("s-function"),
-      takeShort("s-return"),
       {
         kind: "code",
         id: "fn-q2",
         prompt: "두 숫자를 더해 돌려주는 함수 add를 만들고, add(2, 3)과 add(10, 5)가 동작하게 하세요.",
+        goals: ["function add(a, b)", "return을 쓴다", "테스트가 5와 15를 확인한다"],
         starter: `-- function add(a, b)
 
 `,
@@ -412,12 +436,11 @@ print(part["Anchored"])`,
       },
     ],
     tasks: [
-      takeShort("s-index1"),
-      takeShort("s-len"),
       {
         kind: "code",
         id: "tbl-q2",
         prompt: 'Name이 "Pad"인 테이블 part를 만들고 part.Name을 출력하세요.',
+        goals: ["중괄호 테이블을 만든다", "출력은 Pad"],
         starter: `-- local part = { Name = ... }
 
 `,
@@ -428,6 +451,19 @@ print(part["Anchored"])`,
         hint: 'local part = { Name = "Pad" } print(part.Name)',
         solution: `local part = { Name = "Pad" }
 print(part.Name)`,
+      },
+      {
+        kind: "code",
+        id: "tbl-q1",
+        prompt: "pets 배열의 두 번째 값을 출력하세요.",
+        goals: ["인덱스는 1부터", "출력은 dog"],
+        starter: `local pets = {"cat", "dog", "fox"}
+
+`,
+        tests: [{ kind: "output-equals", value: "dog" }],
+        hint: "print(pets[2])",
+        solution: `local pets = {"cat", "dog", "fox"}
+print(pets[2])`,
       },
     ],
   },
@@ -457,8 +493,6 @@ print(Players.LocalPlayer.Name)`,
       },
     ],
     tasks: [
-      takeShort("s-instance-new"),
-      takeShort("s-parent"),
       {
         kind: "choice",
         id: "inst-q1",
@@ -476,6 +510,7 @@ print(Players.LocalPlayer.Name)`,
         kind: "code",
         id: "inst-q2",
         prompt: 'Instance.new("Part")로 파트를 만들고 Name을 "Beacon"으로 정한 뒤 그 이름을 출력하세요. Parent는 workspace로 두세요.',
+        goals: ['Instance.new("Part")', "Name 은 Beacon", "Parent 는 workspace", "이름 출력"],
         starter: `-- local part = Instance.new("Part")
 
 `,
@@ -534,12 +569,11 @@ end)`,
       },
     ],
     tasks: [
-      takeShort("s-connect"),
-      takeShort("s-touched"),
       {
         kind: "code",
         id: "ev-q2",
         prompt: "trap 파트의 Touched에 Connect를 걸고, 닿은 대상의 Name을 출력하세요. 아래 코드는 테스트가 한 번 닿게 해 줍니다.",
+        goals: ["Touched:Connect", "hit.Name 출력", "테스트가 Foot 을 닿게 한다"],
         starter: `local trap = Instance.new("Part")
 trap.Name = "Trap"
 trap.Parent = workspace
@@ -577,6 +611,7 @@ end)`,
       },
     ],
   },
+  ...extraLessons,
 ];
 
 export function getLesson(id: string): Lesson | undefined {

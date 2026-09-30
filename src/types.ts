@@ -39,10 +39,13 @@ export type CodeTask = {
   id: string;
   prompt: string;
   starter: string;
+  before?: string;
   after?: string;
   tests: CodeTest[];
   hint: string;
   solution: string;
+  goals?: string[];
+  topic?: string;
 };
 
 export type Task = ChoiceTask | ShortTask | CodeTask;

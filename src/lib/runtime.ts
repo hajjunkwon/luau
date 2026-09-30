@@ -132,6 +132,9 @@ function InstanceMt:FindFirstChild(name)
   end
   return nil
 end
+function InstanceMt:WaitForChild(name)
+  return self:FindFirstChild(name)
+end
 function InstanceMt:IsA(name)
   return self.ClassName == name
 end
@@ -158,6 +161,16 @@ function Instance.new(className)
     __touched = Signal(),
   }
   obj.Touched = obj.__touched
+  if className == "ClickDetector" then
+    obj.__clicked = Signal()
+    obj.MouseClick = obj.__clicked
+  elseif className == "Humanoid" then
+    obj.Health = 100
+    obj.MaxHealth = 100
+    function obj:TakeDamage(n)
+      self.Health = math.max(0, (self.Health or 0) - (n or 0))
+    end
+  end
   return setmetatable(obj, InstanceMt)
 end
 
@@ -288,7 +301,7 @@ function snapshotGlobals(raw: unknown): Record<string, unknown> {
   return out;
 }
 
-export async function runLuau(source: string, after = ""): Promise<RunResult> {
+export async function runLuau(source: string, after = "", before = ""): Promise<RunResult> {
   const unsupported = detectUnsupported(source);
   if (unsupported) {
     return { ok: false, output: [], globals: {}, error: unsupported };
@@ -303,7 +316,7 @@ export async function runLuau(source: string, after = ""): Promise<RunResult> {
 
   try {
     await engine.doString(PRELUDE);
-    const lua = `${transpileLuau(source)}\n${after ? transpileLuau(after) : ""}`;
+    const lua = `${before ? transpileLuau(before) + "\n" : ""}${transpileLuau(source)}\n${after ? transpileLuau(after) : ""}`;
     await engine.doString(lua);
     const output = (engine.global.get("__output") as string[] | undefined) ?? [];
     const globals = snapshotGlobals(engine.global.get("_G"));

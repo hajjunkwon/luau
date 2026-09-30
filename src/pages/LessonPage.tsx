@@ -1,14 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
+import { CodeMission } from "../components/CodeMission";
 import { getLesson, getNextLesson } from "../data/lessons";
-import { CodeEditor } from "../components/CodeEditor";
-import { OutputConsole } from "../components/OutputConsole";
-import { gradeCode } from "../lib/checkQuiz";
 import { markLesson, markTask, visitLesson } from "../lib/progress";
 import { useProgress } from "../lib/useProgress";
-import type { ChoiceTask, CodeTask, GradeResult, RunResult, ShortTask } from "../types";
-import { runLuau } from "../lib/runtime";
-import { gradeShort, primaryAnswer } from "../lib/gradeShort";
+import type { ChoiceTask } from "../types";
 
 export function LessonPage() {
   const { id = "" } = useParams();
@@ -28,6 +24,13 @@ export function LessonPage() {
   const completedCount = lesson.tasks.filter((t) =>
     progress.completedTasks.includes(t.id),
   ).length;
+
+  const onSolved = (taskId: string) => {
+    const next = markTask(taskId);
+    if (lesson.tasks.every((t) => next.completedTasks.includes(t.id))) {
+      markLesson(lesson.id);
+    }
+  };
 
   return (
     <div className="page lesson-page">
@@ -78,36 +81,15 @@ export function LessonPage() {
             ))}
           </ol>
           {task.kind === "choice" ? (
-            <ChoiceTaskView
+            <ChoiceTaskView task={task} onSolved={() => onSolved(task.id)} />
+          ) : task.kind === "code" ? (
+            <CodeMission
+              key={task.id}
               task={task}
-              onSolved={() => {
-                const next = markTask(task.id);
-                if (lesson.tasks.every((t) => next.completedTasks.includes(t.id))) {
-                  markLesson(lesson.id);
-                }
-              }}
+              editorHeight="280px"
+              onSolved={() => onSolved(task.id)}
             />
-          ) : task.kind === "short" ? (
-            <ShortTaskView
-              task={task}
-              onSolved={() => {
-                const next = markTask(task.id);
-                if (lesson.tasks.every((t) => next.completedTasks.includes(t.id))) {
-                  markLesson(lesson.id);
-                }
-              }}
-            />
-          ) : (
-            <CodeTaskView
-              task={task}
-              onSolved={() => {
-                const next = markTask(task.id);
-                if (lesson.tasks.every((t) => next.completedTasks.includes(t.id))) {
-                  markLesson(lesson.id);
-                }
-              }}
-            />
-          )}
+          ) : null}
           {completedCount === lesson.tasks.length ? (
             <div className="lesson-done">
               이 레슨의 과제를 모두 통과했습니다.
@@ -145,66 +127,6 @@ export function LessonPage() {
           )}
         </section>
       </div>
-    </div>
-  );
-}
-
-function ShortTaskView({
-  task,
-  onSolved,
-}: {
-  task: ShortTask;
-  onSolved: () => void;
-}) {
-  const [draft, setDraft] = useState("");
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    setDraft("");
-    setChecked(false);
-  }, [task.id]);
-
-  const correct = gradeShort(draft, task.answers);
-
-  return (
-    <div className="task-card">
-      <p className="task-kind">주관식</p>
-      <h2>{task.prompt}</h2>
-      <form
-        className="short-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!draft.trim()) return;
-          setChecked(true);
-          if (gradeShort(draft, task.answers)) onSolved();
-        }}
-      >
-        <input
-          className={`short-input ${checked ? (correct ? "right" : "wrong") : ""}`}
-          value={draft}
-          onChange={(event) => {
-            setChecked(false);
-            setDraft(event.target.value);
-          }}
-          placeholder={task.placeholder ?? "답을 입력하세요"}
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-        />
-        <div className="task-actions">
-          <button type="submit" className="btn primary" disabled={!draft.trim()}>
-            정답 확인
-          </button>
-        </div>
-      </form>
-      {checked ? (
-        <p className={`feedback ${correct ? "ok" : "bad"}`}>
-          {correct ? "맞았습니다. " : `정답은 ${primaryAnswer(task.answers)} . `}
-          {task.explain}
-        </p>
-      ) : (
-        <p className="hint">키워드나 기호를 그대로 쓰면 됩니다. print() 처럼 괄호를 붙여도 됩니다.</p>
-      )}
     </div>
   );
 }
@@ -270,110 +192,6 @@ function ChoiceTaskView({
           {correct ? "맞았습니다. " : "아닙니다. "}
           {task.explain}
         </p>
-      ) : null}
-    </div>
-  );
-}
-
-function CodeTaskView({
-  task,
-  onSolved,
-}: {
-  task: CodeTask;
-  onSolved: () => void;
-}) {
-  const [code, setCode] = useState(task.starter);
-  const [grade, setGrade] = useState<GradeResult | null>(null);
-  const [run, setRun] = useState<RunResult | null>(null);
-  const [pending, setPending] = useState(false);
-  const [fails, setFails] = useState(0);
-  const [showSolution, setShowSolution] = useState(false);
-
-  useEffect(() => {
-    setCode(task.starter);
-    setGrade(null);
-    setRun(null);
-    setFails(0);
-    setShowSolution(false);
-  }, [task.id, task.starter]);
-
-  const runCurrent = async () => {
-    setPending(true);
-    const result = await runLuau(code, task.after);
-    setRun(result);
-    setPending(false);
-  };
-
-  const check = async () => {
-    setPending(true);
-    const result = await gradeCode(task, code);
-    setGrade(result);
-    setRun(result.run);
-    setPending(false);
-    if (result.passed) onSolved();
-    else setFails((n) => n + 1);
-  };
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-        event.preventDefault();
-        void runCurrent();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
-
-  const hintVisible = fails >= 1;
-  const editorHeight = useMemo(() => "260px", []);
-
-  return (
-    <div className="task-card code-task">
-      <p className="task-kind">코드 과제 · Ctrl/Cmd + Enter 실행</p>
-      <h2>{task.prompt}</h2>
-      <div className="editor-frame">
-        <CodeEditor value={code} onChange={setCode} height={editorHeight} />
-      </div>
-      <div className="task-actions">
-        <button type="button" className="btn ghost" onClick={() => void runCurrent()} disabled={pending}>
-          실행
-        </button>
-        <button type="button" className="btn primary" onClick={() => void check()} disabled={pending}>
-          채점
-        </button>
-        <button
-          type="button"
-          className="btn ghost"
-          onClick={() => setCode(task.starter)}
-        >
-          초기화
-        </button>
-      </div>
-      <OutputConsole run={run} pending={pending} />
-      {grade ? (
-        <ul className="grade-list">
-          {grade.messages.map((message) => (
-            <li key={message.text} className={message.ok ? "ok" : "bad"}>
-              {message.ok ? "통과" : "실패"} · {message.text}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      {hintVisible ? <p className="hint">힌트: {task.hint}</p> : null}
-      {fails >= 2 ? (
-        <button
-          type="button"
-          className="btn ghost"
-          onClick={() => setShowSolution(true)}
-        >
-          모범 답안 보기
-        </button>
-      ) : null}
-      {showSolution ? (
-        <pre className="code-sample">
-          <code>{task.solution}</code>
-        </pre>
       ) : null}
     </div>
   );

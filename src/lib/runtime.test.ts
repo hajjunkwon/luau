@@ -27,6 +27,43 @@ print(part.Parent.Name)
     expect(result.ok).toBe(true);
     expect(result.output).toEqual(["Beacon", "Workspace"]);
   });
+
+  it("runs Humanoid TakeDamage", async () => {
+    const result = await runLuau(`
+local humanoid = Instance.new("Humanoid")
+humanoid:TakeDamage(30)
+print(humanoid.Health)
+`);
+    expect(result.ok).toBe(true);
+    expect(result.output).toEqual(["70"]);
+  });
+
+  it("fires ClickDetector MouseClick", async () => {
+    const result = await runLuau(
+      `
+local detector = Instance.new("ClickDetector")
+detector.MouseClick:Connect(function()
+  print("opened")
+end)
+`,
+      "detector.MouseClick:Fire()",
+    );
+    expect(result.ok).toBe(true);
+    expect(result.output).toEqual(["opened"]);
+  });
+
+  it("runs before setup then user code", async () => {
+    const result = await runLuau(
+      `print(workspace:WaitForChild("Door").Name)`,
+      "",
+      `local door = Instance.new("Part")
+door.Name = "Door"
+door.Parent = workspace
+`,
+    );
+    expect(result.ok).toBe(true);
+    expect(result.output).toEqual(["Door"]);
+  });
 });
 
 describe("gradeCode solutions", () => {

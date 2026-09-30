@@ -9,10 +9,10 @@ export function LearnIndexPage() {
     <div className="page">
       <header className="page-head">
         <p className="eyebrow">학습</p>
-        <h1>레슨 10개로 print부터 이벤트까지</h1>
+        <h1>레슨 {lessons.length}개로 print부터 클릭·체력까지</h1>
         <p className="lede">
-          각 레슨은 짧은 설명 뒤에 주관식·코드 과제가 이어집니다. 코드 과제는
-          이 브라우저에서 실제로 실행해 채점합니다.
+          각 레슨은 짧은 설명 뒤에 플레이그라운드와 같은 코드 미션이 이어집니다.
+          조건을 보고 코드를 짜면, 이 브라우저에서 실행해 채점합니다.
         </p>
       </header>
       <div className="lesson-grid">

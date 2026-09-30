@@ -44,7 +44,7 @@ export function PlaygroundPage() {
           <h1>자유롭게 실행하는 Luau 편집기</h1>
           <p className="lede">
             템플릿을 고르거나 빈 파일에서 시작하세요. print, Instance, Vector3,
-            Touched:Fire 같은 학습용 API가 준비되어 있습니다.
+            ClickDetector, Humanoid, Touched:Fire 같은 학습용 API가 준비되어 있습니다.
           </p>
         </div>
         <button type="button" className="btn primary" onClick={() => void execute()} disabled={pending}>

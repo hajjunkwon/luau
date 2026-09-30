@@ -68,18 +68,18 @@ function splitStrings(source: string): { text: string; isString: boolean }[] {
   return parts;
 }
 
-const TYPE = "[A-Za-z_][\\w.|?<>]*";
+const TYPE = "[A-Za-z_][\\w.|?<>]*(?![\\w.|?<>])";
 
 function stripTypesOutsideStrings(code: string): string {
   let s = code;
   s = s.replace(new RegExp(`::\\s*${TYPE}`, "g"), "");
-  s = s.replace(/\)\s*:\s*[A-Za-z_][\w.|?<>]*/g, ")");
+  s = s.replace(new RegExp(`\\)\\s*:\\s*${TYPE}(?!\\s*\\()`, "g"), ")");
   s = s.replace(
-    new RegExp(`(\\b(?:local|for)\\s+[A-Za-z_]\\w*)\\s*:\\s*${TYPE}`, "g"),
+    new RegExp(`(\\b(?:local|for)\\s+[A-Za-z_]\\w*)\\s*:\\s*${TYPE}(?!\\s*\\()`, "g"),
     "$1",
   );
   s = s.replace(
-    new RegExp(`(\\(|,\\s*)([A-Za-z_]\\w*)\\s*:\\s*${TYPE}`, "g"),
+    new RegExp(`(\\(|,\\s*)([A-Za-z_]\\w*)\\s*:\\s*${TYPE}(?!\\s*\\()`, "g"),
     "$1$2",
   );
   return s;

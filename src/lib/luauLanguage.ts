@@ -319,6 +319,36 @@ export function registerLuau(monaco: typeof Monaco) {
           range,
         },
         {
+          label: "MouseClick:Connect",
+          kind: Kind.Snippet,
+          insertText:
+            "detector.MouseClick:Connect(function()\n\t${1:print(\"clicked\")}\nend)",
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          documentation: "ClickDetector를 클릭했을 때입니다.",
+          range,
+        },
+        {
+          label: "TakeDamage",
+          kind: Kind.Function,
+          insertText: "humanoid:TakeDamage(${1:10})",
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          range,
+        },
+        {
+          label: "WaitForChild",
+          kind: Kind.Function,
+          insertText: ':WaitForChild("${1:Name}")',
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          range,
+        },
+        {
+          label: "ipairs",
+          kind: Kind.Snippet,
+          insertText: "for ${1:i}, ${2:v} in ipairs(${3:list}) do\n\t${4:print(v)}\nend",
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          range,
+        },
+        {
           label: "game:GetService",
           kind: Kind.Function,
           insertText: 'game:GetService("${1:Players}")',

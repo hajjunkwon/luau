@@ -17,12 +17,12 @@ export function HomePage() {
         <h1>
           Luau를 쓰고,
           <br />
-          바로 퀴즈로 확인하세요.
+          조건에 맞게 코드를 짜세요.
         </h1>
         <p className="lede">
-          Studio를 열기 전에 print부터 Touched까지. 문법 강조 편집기에서 코드를
-          실행하고, 레슨마다 퀴즈로 잠근 개념을 엽니다. 런타임은 학습용 모형이라
-          실제 게임 서버는 아니지만, 스크립트 손맛은 그대로입니다.
+          Studio를 열기 전에 print부터 Humanoid까지. 문법 강조 편집기에서 코드를
+          실행하고, 레슨과 퀴즈는 플레이그라운드와 같은 미션입니다. 조건을 보고
+          코드를 짜면, 실행 결과로 채점합니다.
         </p>
         <div className="hero-actions">
           <Link className="btn primary" to={`/learn/${continueLesson.id}`}>
@@ -30,6 +30,9 @@ export function HomePage() {
           </Link>
           <Link className="btn ghost" to="/playground">
             플레이그라운드
+          </Link>
+          <Link className="btn ghost" to="/quiz">
+            코딩 미션
           </Link>
         </div>
         <dl className="hero-stats">
@@ -64,10 +67,10 @@ export function HomePage() {
           </p>
         </article>
         <article>
-          <h2>주관식 퀴즈</h2>
+          <h2>코딩 미션</h2>
           <p>
-            print, ~=, Instance.new 같은 짧은 답을 직접 씁니다. 레슨 안에도 주관식이
-            있고, 퀴즈 탭에서 20문제를 무작위로 풉니다.
+            조건을 주고 코드를 짜게 합니다. 실행이 잘 되고 출력이 맞으면
+            통과입니다. 퀴즈는 미션 은행에서 무작위로 뽑습니다.
           </p>
         </article>
       </section>
